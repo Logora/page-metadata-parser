@@ -67,6 +67,7 @@ const metadataRuleSets = {
   description: {
     rules: [
       ['meta[property="og:description"]', element => element.getAttribute('content')],
+      ['description', element => element, true],
       ['meta[name="description" i]', element => element.getAttribute('content')],
     ],
   },
@@ -119,6 +120,7 @@ const metadataRuleSets = {
   keywords: {
     rules: [
       ['meta[name="keywords" i]', element => element.getAttribute('content')],
+      ['keywords', element => element, true],
     ],
     processors: [
       (keywords, context) => keywords.split(',').map((keyword) => keyword.trim())
@@ -196,8 +198,8 @@ function getJsonLd(doc, jsonLdTypes) {
   const jsonLds = doc.querySelectorAll('script[type="application/ld+json"]');
   try {
     for(let i = 0; i < jsonLds.length; i++) {
-      const innerText = JSON.parse(jsonLds[i].innerText);
-      if(innerText['@type'] in jsonLdTypes) {
+      const innerText = JSON.parse(jsonLds[i].textContent);
+      if(jsonLdTypes.includes(innerText['@type'])) {
         return innerText;
       }
     }
@@ -211,5 +213,6 @@ module.exports = {
   buildRuleSet,
   getMetadata,
   getProvider,
-  metadataRuleSets
+  metadataRuleSets,
+  getJsonLd
 };
