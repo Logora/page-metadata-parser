@@ -15,27 +15,29 @@ function buildRuleSet(ruleSet) {
     let maxValue;
 
     for (let currRule = 0; currRule < ruleSet.rules.length; currRule++) {
-      const [query, handler] = ruleSet.rules[currRule];
+      const [query, handler, jsonLdRule] = ruleSet.rules[currRule];
 
-      const elements = Array.from(doc.querySelectorAll(query));
+      const elements = (context.jsonLd && jsonLdRule) ? [context.jsonLd[query]] : Array.from(doc.querySelectorAll(query));
 
       if(elements.length) {
         for (const element of elements) {
-          let score = ruleSet.rules.length - currRule;
+          if(element) {
+            let score = ruleSet.rules.length - currRule;
 
-          if (ruleSet.scorers) {
-            for (const scorer of ruleSet.scorers) {
-              const newScore = scorer(element, score);
+            if (ruleSet.scorers) {
+              for (const scorer of ruleSet.scorers) {
+                const newScore = scorer(element, score);
 
-              if (newScore) {
-                score = newScore;
+                if (newScore) {
+                  score = newScore;
+                }
               }
             }
-          }
 
-          if (score > maxScore) {
-            maxScore = score;
-            maxValue = handler(element);
+            if (score > maxScore) {
+              maxScore = score;
+              maxValue = handler(element);
+            }
           }
         }
       }
@@ -103,8 +105,8 @@ const metadataRuleSets = {
   image: {
     rules: [
       ['meta[property="og:image:secure_url"]', element => element.getAttribute('content')],
-      ['meta[property="og:image:url"]', element => element.getAttribute('content')],
       ['meta[property="og:image"]', element => element.getAttribute('content')],
+      ['meta[property="og:image:url"]', element => element.getAttribute('content')],
       ['meta[name="twitter:image"]', element => element.getAttribute('content')],
       ['meta[property="twitter:image"]', element => element.getAttribute('content')],
       ['meta[name="thumbnail"]', element => element.getAttribute('content')],
@@ -126,6 +128,7 @@ const metadataRuleSets = {
   title: {
     rules: [
       ['meta[property="og:title"]', element => element.getAttribute('content')],
+      ['headline', element => element, true],
       ['meta[name="twitter:title"]', element => element.getAttribute('content')],
       ['meta[property="twitter:title"]', element => element.getAttribute('content')],
       ['meta[name="hdl"]', element => element.getAttribute('content')],
@@ -166,13 +169,15 @@ const metadataRuleSets = {
       ['meta[property="og:site_name"]', element => element.getAttribute('content')]
     ],
     defaultValue: (context) => getProvider(parseUrl(context.url))
-  },
+  }
 };
 
-function getMetadata(doc, url, customRuleSets) {
+function getMetadata(doc, url, customRuleSets, jsonLdTypes = []) {
   const metadata = {};
+  const jsonLd = getJsonLd(doc, jsonLdTypes);
   const context = {
     url,
+    jsonLd
   };
 
   const ruleSets = customRuleSets || metadataRuleSets;
@@ -185,6 +190,21 @@ function getMetadata(doc, url, customRuleSets) {
   });
 
   return metadata;
+}
+
+function getJsonLd(doc, jsonLdTypes) {
+  const jsonLds = doc.querySelectorAll('script[type="application/ld+json"]');
+  try {
+    for(let i = 0; i < jsonLds.length; i++) {
+      const innerText = JSON.parse(jsonLds[i].innerText);
+      if(innerText['@type'] in jsonLdTypes) {
+        return innerText;
+      }
+    }
+  } catch(e) {
+    return {};
+  }
+  return {};
 }
 
 module.exports = {
