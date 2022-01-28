@@ -121,6 +121,7 @@ provider | A string representation of the sub and primary domains.
 title | A user displayable title for the page.
 type | The type of content as defined by [opengraph](http://ogp.me/#types).
 url | A canonical URL for the page.
+publishedDate | The published date of the page.
 
 To use a single rule set to find a particular piece of metadata within a page, simply pass that rule set, a URL,  and a [Document](https://developer.mozilla.org/en-US/docs/Web/API/Document) object to getMetadata and it will apply each possible rule for that rule set until it finds a matching piece of information and return it.
 
