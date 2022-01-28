@@ -1,6 +1,6 @@
 // Tests for parse.js
 const {assert} = require('chai');
-const {getProvider, getMetadata, metadataRuleSets} = require('../parser');
+const {getProvider, getMetadata, metadataRuleSets, getJsonLd} = require('../parser');
 const {stringToDom} = require('./test-utils');
 const {parseUrl} = require('../url-utils');
 
@@ -196,5 +196,35 @@ describe('Get Metadata Tests', function() {
     assert.equal(metadata.url, sampleUrl, 'Error finding URL');
     assert.equal(metadata.title, sampleTitle, 'Error finding title');
     assert.equal(metadata.description, sampleDescription, 'Error finding description');
+  });
+
+  it('finds keywords in JSON-LD', () => {
+    const description = 'A test page.';
+    const title = 'Page Title';
+    const sampleJsonLdType = 'NewsArticle';
+    const keywords = 'metada,parser';
+
+    const sampleJsonLdHtml = `
+      <html lang="en-CA">
+      <head>
+        <script type="application/ld+json">
+            {
+                "@context": "http://schema.org",
+                "headline":"${title}",
+                "description": "${description}",
+                "@type":"${sampleJsonLdType}",
+                "author":{"@type":"Person","name":"John Doe"},
+                "datePublished":"2022-01-28T14:36:01+01:00",
+                "dateModified":"2022-01-28T14:36:01+01:00",
+                "keywords":"${keywords}"
+            }
+        </script>
+      </head>
+      </html>
+    `;
+    const doc = stringToDom(sampleJsonLdHtml);
+    const metadata = getJsonLd(doc, ['NewsArticle']);
+
+    assert.equal(metadata.keywords, keywords, `Unable to find ${keywords} in ${sampleJsonLdHtml}`);
   });
 });
