@@ -171,7 +171,15 @@ const metadataRuleSets = {
       ['meta[property="og:site_name"]', element => element.getAttribute('content')]
     ],
     defaultValue: (context) => getProvider(parseUrl(context.url))
-  }
+  },
+
+  publishedDate: {
+    rules: [
+      ['meta[property~="article:published_time"]', element => element.getAttribute('content')],
+      ['meta[property~="og:updated_time"]', element => element.getAttribute('content')],
+      ['datePublished', element => element, true],
+    ],
+  },
 };
 
 function getMetadata(doc, url, customRuleSets, jsonLdTypes = []) {
