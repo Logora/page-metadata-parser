@@ -2,7 +2,10 @@
 const {assert} = require('chai');
 const {getProvider, getMetadata, metadataRuleSets} = require('../parser');
 const {stringToDom} = require('./test-utils');
-const {parseUrl} = require('../url-utils');
+
+function parseUrl(url) {
+  return new URL(url).host;
+}
 
 describe('Get Provider Tests', function() {
   it('gets a provider with no subdomain', function() {
