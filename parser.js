@@ -1,4 +1,10 @@
-const {makeUrlAbsolute, parseUrl} = require('./url-utils');
+function makeUrlAbsolute(base, relative) {
+  return new URL(relative, base).href;
+}
+
+function parseUrl(url) {
+  return new URL(url).host;
+}
 
 function getProvider(host) {
   return host
