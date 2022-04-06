@@ -129,7 +129,13 @@ const metadataRuleSets = {
       ['keywords', element => element, true],
     ],
     processors: [
-      (keywords, context) => Array.isArray(keywords) ? keywords : keywords.split(',').map((keyword) => keyword.trim())
+      (keywords, context) => {
+        if(keywords) {
+          return Array.isArray(keywords) ? keywords : keywords.split(',').map((keyword) => keyword.trim());
+        } else {
+          return [];
+        }
+      }
     ]
   },
 
