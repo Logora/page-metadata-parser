@@ -6,7 +6,7 @@ function parseUrl(url) {
   return new URL(url).host;
 }
 
-function getProvider(host) {
+export function getProvider(host) {
   return host
     .replace(/www[a-zA-Z0-9]*\./, '')
     .replace('.co.', '.')
@@ -15,7 +15,7 @@ function getProvider(host) {
     .join(' ');
 }
 
-function buildRuleSet(ruleSet) {
+export function buildRuleSet(ruleSet) {
   return (doc, context) => {
     let maxScore = 0;
     let maxValue;
@@ -69,7 +69,7 @@ function buildRuleSet(ruleSet) {
   };
 }
 
-const metadataRuleSets = {
+export const metadataRuleSets = {
   description: {
     rules: [
       ['meta[property="og:description"]', element => element.getAttribute('content')],
@@ -200,7 +200,7 @@ const metadataRuleSets = {
   },
 };
 
-function getMetadata(doc, url, customRuleSets, jsonLdTypes = []) {
+export function getMetadata(doc, url, customRuleSets, jsonLdTypes = []) {
   const metadata = {};
   const jsonLd = getJsonLd(doc, jsonLdTypes);
   const context = {
@@ -220,7 +220,7 @@ function getMetadata(doc, url, customRuleSets, jsonLdTypes = []) {
   return metadata;
 }
 
-function getJsonLd(doc, jsonLdTypes) {
+export function getJsonLd(doc, jsonLdTypes) {
   const jsonLds = doc.querySelectorAll('script[type="application/ld+json"]');
   try {
     for(let i = 0; i < jsonLds.length; i++) {
@@ -234,11 +234,3 @@ function getJsonLd(doc, jsonLdTypes) {
   }
   return {};
 }
-
-module.exports = {
-  buildRuleSet,
-  getMetadata,
-  getProvider,
-  metadataRuleSets,
-  getJsonLd
-};
