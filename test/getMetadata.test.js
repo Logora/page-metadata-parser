@@ -1,7 +1,7 @@
 // Tests for parse.js
-const {assert} = require('chai');
-const {getProvider, getMetadata, metadataRuleSets} = require('../parser');
-const {stringToDom} = require('./test-utils');
+import { assert } from 'chai';
+import { getProvider, getMetadata, metadataRuleSets } from '../parser.js';
+import { stringToDom } from './test-utils.js';
 
 function parseUrl(url) {
   return new URL(url).host;

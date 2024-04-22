@@ -1,7 +1,7 @@
 // Tests for parse.js
-const {assert} = require('chai');
-const {buildRuleSet, metadataRuleSets} = require('../parser');
-const {stringToDom} = require('./test-utils');
+import { assert } from 'chai';
+import { buildRuleSet, metadataRuleSets } from '../parser.js';
+import { stringToDom } from './test-utils.js';
 
 function buildHTML(tag) {
   return `

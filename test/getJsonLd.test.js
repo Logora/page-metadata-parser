@@ -1,7 +1,7 @@
 // Tests for parse.js
-const {assert} = require('chai');
-const {getJsonLd} = require('../parser');
-const {stringToDom} = require('./test-utils');
+import { assert } from 'chai';
+import { getJsonLd } from '../parser.js';
+import { stringToDom } from './test-utils.js';
 
 describe('Get JSON-LD', function() {
     const sampleDescription = 'A test page.';

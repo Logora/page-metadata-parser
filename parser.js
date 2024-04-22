@@ -25,9 +25,9 @@ export function buildRuleSet(ruleSet) {
 
       const elements = (context.jsonLd && jsonLdRule) ? [context.jsonLd[query]] : Array.from(doc.querySelectorAll(query));
 
-      if(elements.length) {
+      if (elements.length) {
         for (const element of elements) {
-          if(element) {
+          if (element) {
             let score = ruleSet.rules.length - currRule;
 
             if (ruleSet.scorers) {
@@ -130,10 +130,10 @@ export const metadataRuleSets = {
     ],
     processors: [
       (keywords, context) => {
-        if(keywords) {
-          if(Array.isArray(keywords)) {
+        if (keywords) {
+          if (Array.isArray(keywords)) {
             return keywords;
-          } else if(typeof keywords === 'string' || keywords instanceof String) {
+          } else if (typeof keywords === 'string' || keywords instanceof String) {
             return keywords.split(',').map((keyword) => keyword.trim());
           } else {
             return [];
@@ -223,13 +223,13 @@ export function getMetadata(doc, url, customRuleSets, jsonLdTypes = []) {
 export function getJsonLd(doc, jsonLdTypes) {
   const jsonLds = doc.querySelectorAll('script[type="application/ld+json"]');
   try {
-    for(let i = 0; i < jsonLds.length; i++) {
+    for (let i = 0; i < jsonLds.length; i++) {
       const innerText = JSON.parse(jsonLds[i].textContent);
-      if(jsonLdTypes.includes(innerText['@type'])) {
+      if (jsonLdTypes.includes(innerText['@type'])) {
         return innerText;
       }
     }
-  } catch(e) {
+  } catch (e) {
     return {};
   }
   return {};

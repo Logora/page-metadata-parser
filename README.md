@@ -67,13 +67,14 @@ and embedding the resultant js file directly into a page like so:
 
 To use the library in node, you must first construct a DOM API compatible object from an HTML string, for example:
 
-    const {getMetadata} = require('page-metadata-parser');
-    const domino = require('domino');
+    import { getMetadata } from 'page-metadata-parser';
+    import jsdom from 'jsdom';
 
     const url = 'https://github.com/mozilla/page-metadata-parser';
     const response = await fetch(url);
     const html = await response.text();
-    const doc = domino.createWindow(html).document;
+    const dom = new jsdom.JSDOM(html);
+    const doc = dom.window.document;
     const metadata = getMetadata(doc, url);
 
 ## Metadata Rules
