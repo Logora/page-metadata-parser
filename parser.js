@@ -19,35 +19,52 @@ export function buildRuleSet(ruleSet) {
   return (doc, context) => {
     let maxScore = 0;
     let maxValue;
+    let accumulativeResults = {}; 
 
     for (let currRule = 0; currRule < ruleSet.rules.length; currRule++) {
-      const [query, handler, jsonLdRule] = ruleSet.rules[currRule];
+      const [query, handler, jsonLdRule, accumulative] = ruleSet.rules[currRule]; 
 
-      const elements = (context.jsonLd && jsonLdRule) ? [context.jsonLd[query]] : Array.from(doc.querySelectorAll(query));
+      let elements;
+      if (accumulative) {
+        if (!accumulativeResults[query]) {
+          accumulativeResults[query] = [];
+        }
+        elements = Array.from(doc.querySelectorAll(query));
+        accumulativeResults[query].push(...elements.map(handler));
+      } else {
+        elements = (context.jsonLd && jsonLdRule) ? [context.jsonLd[query]] : Array.from(doc.querySelectorAll(query));
 
-      if (elements.length) {
-        for (const element of elements) {
-          if (element) {
-            let score = ruleSet.rules.length - currRule;
+        if (elements.length) {
+          for (const element of elements) {
+            if (element) {
+              let score = ruleSet.rules.length - currRule;
 
-            if (ruleSet.scorers) {
-              for (const scorer of ruleSet.scorers) {
-                const newScore = scorer(element, score);
+              if (ruleSet.scorers) {
+                for (const scorer of ruleSet.scorers) {
+                  const newScore = scorer(element, score);
 
-                if (newScore) {
-                  score = newScore;
+                  if (newScore) {
+                    score = newScore;
+                  }
                 }
               }
-            }
 
-            if (score > maxScore) {
-              maxScore = score;
-              maxValue = handler(element);
+              if (score > maxScore) {
+                maxScore = score;
+                maxValue = handler(element);
+              }
             }
           }
         }
       }
     }
+
+    Object.keys(accumulativeResults).forEach(query => {
+      let combinedValue = accumulativeResults[query].join(', ');
+      if (combinedValue.trim()) {
+        maxValue = combinedValue.trim();
+      }
+    });
 
     if (!maxValue && ruleSet.defaultValue) {
       maxValue = ruleSet.defaultValue(context);
@@ -123,24 +140,26 @@ export const metadataRuleSets = {
     ],
   },
 
+
   keywords: {
     rules: [
       ['meta[name="keywords" i]', element => element.getAttribute('content')],
+      ['meta[property="article:tag"]', element => element.getAttribute('content'), false, true], // Marked as accumulative
       ['keywords', element => element, true],
     ],
     processors: [
       (keywords, context) => {
+        let allKeywords = [];
         if (keywords) {
           if (Array.isArray(keywords)) {
-            return keywords;
+            allKeywords = keywords.flatMap(keyword => 
+              typeof keyword === 'string' || keyword instanceof String ? keyword.split(',').map(keyword => keyword.trim()) : []
+            );
           } else if (typeof keywords === 'string' || keywords instanceof String) {
-            return keywords.split(',').map((keyword) => keyword.trim());
-          } else {
-            return [];
+            allKeywords = keywords.split(',').map(keyword => keyword.trim());
           }
-        } else {
-          return [];
-        }
+        } 
+        return allKeywords.filter((keyword, index, self) => self.indexOf(keyword) === index); 
       }
     ]
   },

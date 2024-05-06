@@ -40,6 +40,7 @@ describe('Get Metadata Tests', function() {
   const sampleProviderName = 'Example Provider';
   const sampleLanguage = 'en';
   const samplePublishedDate = '2022-01-28T12:11:55+01:00';
+  const sampleTags = ["Test", "Example", "Tags"];
 
 
   const sampleHtml = `
@@ -216,6 +217,23 @@ describe('Get Metadata Tests', function() {
     const doc = stringToDom(html);
     const metadata = getMetadata(doc, sampleUrl, metadataRuleSets);
 
-    assert.equal(metadata.publishedDate, samplePublishedDate, `Unable to find ${samplePublishedDate} in ${html}`);
+    assert.deepEqual(metadata.publishedDate, samplePublishedDate, `Unable to find ${samplePublishedDate} in ${html}`);
+  });
+
+  it('finds separated keywords in metadata', () => {
+    const html = `
+      <html>
+      <head>
+        <meta property="article:tag" content="${sampleTags[0]}" />
+        <meta property="article:tag" content="${sampleTags[1]}" />
+        <meta property="article:tag" content="${sampleTags[2]}" />
+      </head>
+      </html>
+    `;
+
+    const doc = stringToDom(html);
+    const metadata = getMetadata(doc, sampleUrl, metadataRuleSets);
+
+    assert.deepEqual(metadata.keywords, sampleTags, `Unable to find ${sampleTags} in ${html}`);
   });
 });
