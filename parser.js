@@ -244,9 +244,7 @@ export function getJsonLd(doc, jsonLdTypes) {
   try {
     for (let i = 0; i < jsonLds.length; i++) {
       const innerText = JSON.parse(jsonLds[i].textContent);
-      if (jsonLdTypes.includes(innerText['@type'])) {
-        return innerText;
-      }
+      return innerText.find(j => ("@type" in j) && jsonLdTypes.includes(j["@type"])) || {};
     }
   } catch (e) {
     return {};
