@@ -241,10 +241,15 @@ export function getMetadata(doc, url, customRuleSets, jsonLdTypes = []) {
 
 export function getJsonLd(doc, jsonLdTypes) {
   const jsonLds = doc.querySelectorAll('script[type="application/ld+json"]');
+
   try {
-    for (let i = 0; i < jsonLds.length; i++) {
-      const innerText = JSON.parse(jsonLds[i].textContent);
-      return innerText.find(j => ("@type" in j) && jsonLdTypes.includes(j["@type"])) || {};
+    for (const jsonLd of jsonLds) {
+      const innerText = JSON.parse(jsonLd.textContent);
+      if(Array.isArray(innerText)) {
+        return innerText.find(j => jsonLdTypes.includes(j["@type"])) || {};
+      } else {
+        return (jsonLdTypes.includes(innerText["@type"]) && innerText) || {};
+      } 
     }
   } catch (e) {
     return {};
