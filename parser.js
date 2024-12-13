@@ -145,6 +145,7 @@ export const metadataRuleSets = {
     rules: [
       ['meta[name="keywords" i]', element => element.getAttribute('content')],
       ['meta[property="article:tag"]', element => element.getAttribute('content'), false, true], // Marked as accumulative
+      ['meta[property="og:article:tag"]', element => element.getAttribute('content'), false, true],
       ['keywords', element => element, true],
     ],
     processors: [
