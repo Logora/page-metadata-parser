@@ -19,10 +19,10 @@ export function buildRuleSet(ruleSet) {
   return (doc, context) => {
     let maxScore = 0;
     let maxValue;
-    let accumulativeResults = {}; 
+    let accumulativeResults = {};
 
     for (let currRule = 0; currRule < ruleSet.rules.length; currRule++) {
-      const [query, handler, jsonLdRule, accumulative] = ruleSet.rules[currRule]; 
+      const [query, handler, jsonLdRule, accumulative] = ruleSet.rules[currRule];
 
       let elements;
       if (accumulative) {
@@ -153,14 +153,14 @@ export const metadataRuleSets = {
         let allKeywords = [];
         if (keywords) {
           if (Array.isArray(keywords)) {
-            allKeywords = keywords.flatMap(keyword => 
+            allKeywords = keywords.flatMap(keyword =>
               typeof keyword === 'string' || keyword instanceof String ? keyword.split(',').map(keyword => keyword.trim()) : []
             );
           } else if (typeof keywords === 'string' || keywords instanceof String) {
             allKeywords = keywords.split(',').map(keyword => keyword.trim());
           }
-        } 
-        return allKeywords.filter((keyword, index, self) => self.indexOf(keyword) === index); 
+        }
+        return allKeywords.filter((keyword, index, self) => self.indexOf(keyword) === index);
       }
     ]
   },
@@ -246,11 +246,14 @@ export function getJsonLd(doc, jsonLdTypes) {
   try {
     for (const jsonLd of jsonLds) {
       const innerText = JSON.parse(jsonLd.textContent);
-      if(Array.isArray(innerText)) {
+      if (Array.isArray(innerText)) {
         return innerText.find(j => jsonLdTypes.includes(j["@type"])) || {};
       } else {
-        return (jsonLdTypes.includes(innerText["@type"]) && innerText) || {};
-      } 
+        if (!jsonLdTypes.includes(innerText["@type"])) {
+          continue
+        }
+        return innerText;
+      }
     }
   } catch (e) {
     return {};
