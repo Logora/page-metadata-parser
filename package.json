@@ -1,7 +1,7 @@
 {
   "name": "article-metadata-parser",
   "description": "A JavaScript library for parsing metadata in a Web Page.",
-  "version": "1.2.5",
+  "version": "1.2.6",
   "author": "Jared Kerim",
   "bugs": {
     "url": "https://github.com/Logora/page-metadata-parser/issues"
